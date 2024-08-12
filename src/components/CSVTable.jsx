@@ -36,32 +36,33 @@ const CSVTable = ({ data, headers, onRowUpdate, onRowAdd, onRowDelete }) => {
   };
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto border rounded-lg">
       <Table>
         <TableHeader>
           <TableRow>
             {headers.map((header) => (
-              <TableHead key={header}>{header}</TableHead>
+              <TableHead key={header} className="font-bold">{header}</TableHead>
             ))}
-            <TableHead>Actions</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.map((row, rowIndex) => (
-            <TableRow key={rowIndex}>
+            <TableRow key={rowIndex} className="hover:bg-gray-50 dark:hover:bg-gray-800">
               {headers.map((header) => (
                 <TableCell key={header}>
                   {editingRow === rowIndex ? (
                     <Input
                       value={row[header]}
                       onChange={(e) => handleChange(rowIndex, header, e.target.value)}
+                      className="w-full"
                     />
                   ) : (
                     row[header]
                   )}
                 </TableCell>
               ))}
-              <TableCell>
+              <TableCell className="text-right space-x-2">
                 {editingRow === rowIndex ? (
                   <>
                     <Button size="sm" onClick={() => handleSave(rowIndex)}>
@@ -73,7 +74,7 @@ const CSVTable = ({ data, headers, onRowUpdate, onRowAdd, onRowDelete }) => {
                   </>
                 ) : (
                   <>
-                    <Button size="sm" onClick={() => handleEdit(rowIndex)}>
+                    <Button size="sm" variant="outline" onClick={() => handleEdit(rowIndex)}>
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <Button size="sm" variant="destructive" onClick={() => onRowDelete(rowIndex)}>
@@ -91,12 +92,14 @@ const CSVTable = ({ data, headers, onRowUpdate, onRowAdd, onRowDelete }) => {
                   placeholder={`New ${header}`}
                   value={newRow[header] || ''}
                   onChange={(e) => handleNewRowChange(header, e.target.value)}
+                  className="w-full"
                 />
               </TableCell>
             ))}
-            <TableCell>
+            <TableCell className="text-right">
               <Button size="sm" onClick={handleAddRow}>
-                <Plus className="h-4 w-4" />
+                <Plus className="h-4 w-4 mr-2" />
+                Add Row
               </Button>
             </TableCell>
           </TableRow>

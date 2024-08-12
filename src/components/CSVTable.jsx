@@ -1,45 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Pencil, Trash, Plus, Check, X } from 'lucide-react';
+import { Plus, Trash } from 'lucide-react';
 
 const CSVTable = ({ data, headers, onRowUpdate, onRowAdd, onRowDelete }) => {
-  const [editingRow, setEditingRow] = useState(null);
-  const [newRow, setNewRow] = useState({});
+  const [tableData, setTableData] = useState(data);
 
-  const handleEdit = (rowIndex) => {
-    setEditingRow(rowIndex);
-  };
+  useEffect(() => {
+    setTableData(data);
+  }, [data]);
 
-  const handleSave = (rowIndex) => {
-    onRowUpdate(data[rowIndex], rowIndex);
-    setEditingRow(null);
-  };
-
-  const handleCancel = () => {
-    setEditingRow(null);
-  };
-
-  const handleChange = (rowIndex, header, value) => {
-    const updatedRow = { ...data[rowIndex], [header]: value };
-    onRowUpdate(updatedRow, rowIndex);
-  };
-
-  const handleNewRowChange = (header, value) => {
-    setNewRow({ ...newRow, [header]: value });
+  const handleCellChange = (rowIndex, header, value) => {
+    const updatedData = [...tableData];
+    updatedData[rowIndex] = { ...updatedData[rowIndex], [header]: value };
+    setTableData(updatedData);
+    onRowUpdate(updatedData[rowIndex], rowIndex);
   };
 
   const handleAddRow = () => {
+    const newRow = headers.reduce((acc, header) => ({ ...acc, [header]: '' }), {});
     onRowAdd(newRow);
-    setNewRow({});
+  };
+
+  const handleDeleteRow = (rowIndex) => {
+    onRowDelete(rowIndex);
   };
 
   return (
     <div className="overflow-x-auto border rounded-lg">
       <Table>
         <TableHeader>
-          <TableRow>
+          <TableRow className="bg-gray-100 dark:bg-gray-800">
             {headers.map((header) => (
               <TableHead key={header} className="font-bold">{header}</TableHead>
             ))}
@@ -47,64 +39,32 @@ const CSVTable = ({ data, headers, onRowUpdate, onRowAdd, onRowDelete }) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map((row, rowIndex) => (
+          {tableData.map((row, rowIndex) => (
             <TableRow key={rowIndex} className="hover:bg-gray-50 dark:hover:bg-gray-800">
               {headers.map((header) => (
-                <TableCell key={header}>
-                  {editingRow === rowIndex ? (
-                    <Input
-                      value={row[header]}
-                      onChange={(e) => handleChange(rowIndex, header, e.target.value)}
-                      className="w-full"
-                    />
-                  ) : (
-                    row[header]
-                  )}
+                <TableCell key={header} className="p-0">
+                  <Input
+                    value={row[header] || ''}
+                    onChange={(e) => handleCellChange(rowIndex, header, e.target.value)}
+                    className="w-full h-full border-none focus:ring-0"
+                  />
                 </TableCell>
               ))}
-              <TableCell className="text-right space-x-2">
-                {editingRow === rowIndex ? (
-                  <>
-                    <Button size="sm" onClick={() => handleSave(rowIndex)}>
-                      <Check className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={handleCancel}>
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button size="sm" variant="outline" onClick={() => handleEdit(rowIndex)}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="destructive" onClick={() => onRowDelete(rowIndex)}>
-                      <Trash className="h-4 w-4" />
-                    </Button>
-                  </>
-                )}
+              <TableCell className="text-right">
+                <Button size="sm" variant="destructive" onClick={() => handleDeleteRow(rowIndex)}>
+                  <Trash className="h-4 w-4" />
+                </Button>
               </TableCell>
             </TableRow>
           ))}
-          <TableRow>
-            {headers.map((header) => (
-              <TableCell key={header}>
-                <Input
-                  placeholder={`New ${header}`}
-                  value={newRow[header] || ''}
-                  onChange={(e) => handleNewRowChange(header, e.target.value)}
-                  className="w-full"
-                />
-              </TableCell>
-            ))}
-            <TableCell className="text-right">
-              <Button size="sm" onClick={handleAddRow}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Row
-              </Button>
-            </TableCell>
-          </TableRow>
         </TableBody>
       </Table>
+      <div className="flex justify-center mt-4">
+        <Button onClick={handleAddRow}>
+          <Plus className="h-4 w-4 mr-2" />
+          Add Row
+        </Button>
+      </div>
     </div>
   );
 };

@@ -53,7 +53,7 @@ const CSVManager = () => {
           <Info className="h-4 w-4" />
           <AlertTitle>CSV file loaded: {fileName}</AlertTitle>
           <AlertDescription>
-            You can now edit, add, or delete rows. Don't forget to download your changes when you're done.
+            You can now edit cells directly, add or delete rows. Don't forget to download your changes when you're done.
           </AlertDescription>
         </Alert>
       )}
@@ -74,7 +74,7 @@ const CSVManager = () => {
             onRowAdd={handleRowAdd}
             onRowDelete={handleRowDelete}
           />
-          <div className="flex justify-end">
+          <div className="flex justify-end mt-4">
             <CSVDownloader data={csvData} headers={headers} fileName={fileName} />
           </div>
         </>
